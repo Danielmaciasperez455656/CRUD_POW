@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD Inventario</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Gestión de Productos</h1>
+        <a href="/create" class="btn btn-primary">Nuevo Producto</a>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (data.length > 0) { %>
+                    <% data.forEach((product) => { %>
+                        <tr>
+                            <td><%= product.id %></td>
+                            <td><%= product.nombre %></td>
+                            <td>$<%= product.precio %></td>
+                            <td><%= product.cantidad %></td>
+                            <td>
+                                <a href="/update/<%= product.id %>" class="btn btn-edit">Editar</a>
+                                <a href="/delete/<%= product.id %>" class="btn btn-delete">Borrar</a> 
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="5">No hay productos registrados</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Obtiene los parámetros de la URL (message, op)
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        const operation = urlParams.get('op');
+
+        if (message === 'success') {
+            let title = '';
+            let text = 'La operación se realizó con éxito.';
+
+            // Define mensajes específicos según la operación
+            if (operation === 'create') {
+                title = '¡Producto Agregado! 💾';
+                text = 'El nuevo producto ha sido guardado.';
+            } else if (operation === 'update') {
+                title = '¡Producto Actualizado! ✅';
+                text = 'Los datos del producto han sido modificados.';
+            } else if (operation === 'delete') {
+                title = '¡Producto Eliminado! 🗑️';
+                text = 'El producto fue eliminado permanentemente.';
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: title,
+                text: text,
+                confirmButtonText: 'Genial'
+            }).then(() => {
+                // Limpia la URL para evitar que la alerta se muestre al recargar
+                window.history.replaceState({}, document.title, "/");
+            });
+
+        } else if (message === 'error') {
+            // Muestra un SweetAlert de error genérico
+            Swal.fire({
+                icon: 'error',
+                title: '¡Error! ❌',
+                text: 'Ha ocurrido un error al procesar tu solicitud. Revisa la consola del servidor.',
+                confirmButtonText: 'Aceptar'
+            }).then(() => {
+                window.history.replaceState({}, document.title, "/");
+            });
+        }
+    </script>
+</body>
+</html>
