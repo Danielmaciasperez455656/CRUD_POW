@@ -23,5 +23,6 @@ app.use('/', productRoutes);
 
 // Iniciar servidor
 app.listen(app.get('port'), () => {
-    console.log(`Servidor corriendo en el puerto ${app.get('port')}`);
+    const port = app.get('port');
+    console.log(`Servidor corriendo en http://localhost:${port}`);
 });

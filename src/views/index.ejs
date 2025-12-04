@@ -8,86 +8,187 @@
 <body>
     <div class="container">
         <h1>Gestión de Productos</h1>
-        <a href="/create" class="btn btn-primary">Nuevo Producto</a>
 
+        <!-- Dashboard simple -->
+        <div style="display:flex; gap:16px; margin-bottom:16px; align-items:center;">
+            <div style="flex:1;">
+                <strong>Total productos:</strong> <%= stats.total_productos %>
+            </div>
+
+            <div style="flex:2;">
+                <strong>Valor inventario:</strong>
+                <%= new Intl.NumberFormat("es-CO", { 
+                    style: "currency", 
+                    currency: "COP",
+                    minimumFractionDigits: 0
+                }).format(stats.valor_total) %>
+            </div>
+
+            <div style="flex:3;">
+                <strong>Top stock:</strong>
+                <% stats.top_stock.forEach(item => { %>
+                    <span style="margin-right:8px;"><%= item.nombre %> (<%= item.cantidad %>)</span>
+                <% }) %>
+            </div>
+
+            <a href="/create" class="btn btn-primary">Nuevo Producto</a>
+        </div>
+
+
+        <!-- Buscador -->
+        <div style="display:flex; gap:8px; margin-bottom:8px; align-items:center;">
+            <input id="search" type="text" placeholder="Buscar producto..." value="<%= query.q %>" style="flex:1; padding:8px; border-radius:6px; border:1px solid #ccc;">
+            <form method="GET" action="/" style="display:inline;">
+                <input type="hidden" name="q" id="hiddenSearch" value="<%= query.q %>">
+                <button type="submit" class="btn btn-secondary">Buscar (Server)</button>
+            </form>
+        </div>
+
+
+        <!-- TABLA DE PRODUCTOS -->
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Precio</th>
-                    <th>Cantidad</th>
+                    <th><a href="?sort=id&order=<%= query.sort==='id' && query.order==='DESC' ? 'ASC' : 'DESC' %>">ID</a></th>
+                    <th><a href="?sort=nombre&order=<%= query.sort==='nombre' && query.order==='DESC' ? 'ASC' : 'DESC' %>">Nombre</a></th>
+                    <th><a href="?sort=precio&order=<%= query.sort==='precio' && query.order==='DESC' ? 'ASC' : 'DESC' %>">Precio</a></th>
+                    <th><a href="?sort=cantidad&order=<%= query.sort==='cantidad' && query.order==='DESC' ? 'ASC' : 'DESC' %>">Cantidad</a></th>
+                    <th>Valor Total</th>
+                    <th>Imagen</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
+
             <tbody>
                 <% if (data.length > 0) { %>
                     <% data.forEach((product) => { %>
                         <tr>
                             <td><%= product.id %></td>
+
                             <td><%= product.nombre %></td>
-                            <td>$<%= product.precio %></td>
+
+                            <td>
+                                <%= new Intl.NumberFormat("es-CO", { 
+                                    style: "currency", 
+                                    currency: "COP",
+                                    minimumFractionDigits: 0 
+                                }).format(product.precio) %>
+                            </td>
+
                             <td><%= product.cantidad %></td>
+
+                            <td>
+                                <%= new Intl.NumberFormat("es-CO", {
+                                    style: "currency",
+                                    currency: "COP",
+                                    minimumFractionDigits: 0
+                                }).format(product.precio * product.cantidad) %>
+                            </td>
+
+                            <td>
+                                <% if (product.imagen) { %>
+                                    <img src="<%= product.imagen %>" alt="img" style="width:60px; height:40px; object-fit:cover; border-radius:6px;">
+                                <% } else { %>
+                                    <span style="color:#888;">Sin imagen</span>
+                                <% } %>
+                            </td>
+
                             <td>
                                 <a href="/update/<%= product.id %>" class="btn btn-edit">Editar</a>
-                                <a href="/delete/<%= product.id %>" class="btn btn-delete">Borrar</a> 
+
+                                <!-- Formulario POST para borrar -->
+                                <form id="frm-delete-<%= product.id %>" action="/delete/<%= product.id %>" method="POST" style="display:inline;">
+                                    <button type="button" class="btn btn-delete" onclick="confirmDelete('<%= product.id %>')">Borrar</button>
+                                </form>
                             </td>
                         </tr>
                     <% }) %>
+
                 <% } else { %>
                     <tr>
-                        <td colspan="5">No hay productos registrados</td>
+                        <td colspan="7" class="text-center">No hay productos registrados</td>
                     </tr>
                 <% } %>
             </tbody>
         </table>
+
+
+        <!-- Paginación -->
+        <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+            <% if (pagination.totalPages > 1) { %>
+                <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+                    <a href="?page=<%= i %>&q=<%= query.q %>&sort=<%= query.sort %>&order=<%= query.order %>" class="btn <%= pagination.page===i ? 'btn-primary' : 'btn-secondary' %>"><%= i %></a>
+                <% } %>
+            <% } %>
+        </div>
     </div>
 
+
+    <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // Obtiene los parámetros de la URL (message, op)
-        const urlParams = new URLSearchParams(window.location.search);
-        const message = urlParams.get('message');
-        const operation = urlParams.get('op');
+        // Búsqueda en vivo
+        document.getElementById('search').addEventListener('keyup', function(e) {
+            const q = this.value.toLowerCase().trim();
+            document.getElementById('hiddenSearch').value = this.value;
+            const rows = document.querySelectorAll("tbody tr");
 
-        if (message === 'success') {
-            let title = '';
-            let text = 'La operación se realizó con éxito.';
-
-            // Define mensajes específicos según la operación
-            if (operation === 'create') {
-                title = '¡Producto Agregado! 💾';
-                text = 'El nuevo producto ha sido guardado.';
-            } else if (operation === 'update') {
-                title = '¡Producto Actualizado! ✅';
-                text = 'Los datos del producto han sido modificados.';
-            } else if (operation === 'delete') {
-                title = '¡Producto Eliminado! 🗑️';
-                text = 'El producto fue eliminado permanentemente.';
-            }
-
-            Swal.fire({
-                icon: 'success',
-                title: title,
-                text: text,
-                confirmButtonText: 'Genial'
-            }).then(() => {
-                // Limpia la URL para evitar que la alerta se muestre al recargar
-                window.history.replaceState({}, document.title, "/");
+            rows.forEach(r => {
+                const text = r.innerText.toLowerCase();
+                r.style.display = text.includes(q) ? '' : 'none';
             });
+        });
 
-        } else if (message === 'error') {
-            // Muestra un SweetAlert de error genérico
+
+        // Confirmación de eliminación
+        function confirmDelete(id) {
             Swal.fire({
-                icon: 'error',
-                title: '¡Error! ❌',
-                text: 'Ha ocurrido un error al procesar tu solicitud. Revisa la consola del servidor.',
-                confirmButtonText: 'Aceptar'
-            }).then(() => {
-                window.history.replaceState({}, document.title, "/");
+                title: "¿Eliminar producto?",
+                text: "Esta acción no se puede deshacer.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#e74c3c",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('frm-delete-' + id).submit();
+                }
             });
         }
+
+
+        // SweetAlerts automáticos
+        (function handleAlerts() {
+            const params = new URLSearchParams(window.location.search);
+            const message = params.get('message');
+            const op = params.get('op');
+            const reason = params.get('reason');
+
+            if (message === 'success') {
+                let title = 'Operación exitosa';
+                if (op === 'create') title = '¡Producto agregado!';
+                if (op === 'update') title = '¡Producto actualizado!';
+                if (op === 'delete') title = '¡Producto eliminado!';
+
+                Swal.fire({ icon: 'success', title, confirmButtonText: 'OK' })
+                .then(() => window.history.replaceState({}, document.title, "/"));
+            }
+
+            else if (message === 'error') {
+                let text = 'Ha ocurrido un error.';
+                if (reason === 'invalid_name') text = 'Nombre inválido.';
+                if (reason === 'invalid_price') text = 'Precio inválido.';
+                if (reason === 'invalid_qty') text = 'Cantidad inválida.';
+                if (reason === 'not_found') text = 'Producto no encontrado.';
+                if (reason === 'server') text = 'Error del servidor.';
+
+                Swal.fire({ icon: 'error', title: 'Error', text })
+                .then(() => window.history.replaceState({}, document.title, "/"));
+            }
+        })();
     </script>
 </body>
 </html>

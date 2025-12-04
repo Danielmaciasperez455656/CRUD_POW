@@ -8,10 +8,23 @@
 <body>
     <div class="container">
         <h2>Editar Producto</h2>
-        <form action="/update/<%= data.id %>" method="POST">
+        <form action="/update/<%= data.id %>" method="POST" enctype="multipart/form-data">
             <input type="text" name="nombre" value="<%= data.nombre %>" required>
             <input type="number" name="precio" value="<%= data.precio %>" step="0.01" required>
             <input type="number" name="cantidad" value="<%= data.cantidad %>" required>
+
+            <div style="margin:10px 0;">
+                <strong>Imagen actual:</strong><br>
+                <% if (data.imagen) { %>
+                    <img src="<%= data.imagen %>" style="width:120px; height:80px; object-fit:cover; border-radius:6px;">
+                <% } else { %>
+                    <span style="color:#777;">Sin imagen</span>
+                <% } %>
+            </div>
+
+            <label for="imagen">Cambiar imagen (opcional)</label>
+            <input type="file" name="imagen" accept="image/*">
+
             <button type="submit" class="btn btn-edit">Actualizar</button>
             <a href="/" class="btn btn-secondary">Cancelar</a>
         </form>

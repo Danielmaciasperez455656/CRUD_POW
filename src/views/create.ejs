@@ -8,10 +8,12 @@
 <body>
     <div class="container">
         <h2>Agregar Nuevo Producto</h2>
-        <form action="/add" method="POST">
+        <form action="/add" method="POST" enctype="multipart/form-data">
             <input type="text" name="nombre" placeholder="Nombre del producto" required>
             <input type="number" name="precio" placeholder="Precio" step="0.01" required>
             <input type="number" name="cantidad" placeholder="Cantidad" required>
+            <label for="imagen">Imagen (opcional)</label>
+            <input type="file" name="imagen" accept="image/*">
             <button type="submit" class="btn btn-primary">Guardar</button>
             <a href="/" class="btn btn-secondary">Cancelar</a>
         </form>
