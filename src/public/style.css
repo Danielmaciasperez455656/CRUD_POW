@@ -1,4 +1,3 @@
-/* --- ESTILO GENERAL --- */
 body { 
     font-family: "Segoe UI", Arial, sans-serif; 
     background: #eef1f5; 
@@ -6,7 +5,6 @@ body {
     color: #333;
 }
 
-/* Contenedor centrado y elegante */
 .container { 
     max-width: 900px; 
     margin: 0 auto; 
@@ -16,7 +14,6 @@ body {
     box-shadow: 0 6px 20px rgba(0,0,0,0.08); 
 }
 
-/* --- TABLA --- */
 table { 
     width: 100%; 
     border-collapse: collapse; 
@@ -25,15 +22,12 @@ table {
     overflow: hidden;
 }
 
-/* Encabezado más moderno */
 th { 
     background: #343a40; 
     color: #fff; 
     padding: 14px; 
     text-align: left; 
     font-weight: 600;
-
-    /* CORRECCIÓN DEL PROBLEMA */
     cursor: default !important;
     user-select: none;
     text-decoration: none !important;
@@ -43,18 +37,15 @@ th:hover, th:active {
     text-decoration: none !important;
 }
 
-/* Celdas */
 td { 
     padding: 12px; 
     border-bottom: 1px solid #e5e5e5; 
 }
 
-/* Hover suave */
 tbody tr:hover { 
     background: #f5f7fa; 
 }
 
-/* --- BOTONES --- */
 .btn { 
     padding: 8px 16px;
     border-radius: 6px;
@@ -67,41 +58,34 @@ tbody tr:hover {
     text-decoration: none;
 }
 
-/* Efecto click */
 .btn:active {
     transform: scale(0.96);
 }
 
-/* Botón verde principal */
 .btn-primary { 
     background: #2ecc71; 
     color: #fff; 
 }
 
-/* Editar */
 .btn-edit { 
     background: #f1c40f; 
     color: #000; 
 }
 
-/* Eliminar */
 .btn-delete { 
     background: #e74c3c; 
     color: #fff; 
 }
 
-/* Secundario */
 .btn-secondary { 
     background: #7f8c8d; 
     color: #fff; 
 }
 
-/* Hover general */
 .btn:hover {
     opacity: 0.85;
 }
 
-/* --- INPUTS --- */
 input { 
     width: 100%; 
     padding: 12px; 
@@ -112,21 +96,18 @@ input {
     font-size: 15px;
 }
 
-/* Inputs focus más bonitos */
 input:focus {
     outline: none;
     border-color: #3498db;
     box-shadow: 0 0 6px rgba(52, 152, 219, 0.4);
 }
 
-/* Quitar subrayado de los enlaces en los headers */
 th a {
     color: inherit;
     text-decoration: none;
 }
 
-/* Evitar subrayado cuando pasas el mouse */
 th a:hover {
     text-decoration: none;
-    color: #ddd; /* Opcional, para indicar hover */
+    color: #ddd;
 }

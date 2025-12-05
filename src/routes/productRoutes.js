@@ -5,11 +5,11 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Asegura carpeta de uploads
+
 const uploadDir = path.join(__dirname, '..', 'public', 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
-// Config multer
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, uploadDir);
@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({
     storage,
-    limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+    limits: { fileSize: 2 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         const allowed = /jpeg|jpg|png|webp/;
         const ext = path.extname(file.originalname).toLowerCase();
@@ -35,7 +35,6 @@ router.get('/create', (req, res) => res.render('create'));
 router.post('/add', upload.single('imagen'), productController.save);
 router.get('/update/:id', productController.edit);
 router.post('/update/:id', upload.single('imagen'), productController.update);
-// Cambiamos a POST para borrar
 router.post('/delete/:id', productController.delete);
 
 module.exports = router;
